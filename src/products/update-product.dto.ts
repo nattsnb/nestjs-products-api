@@ -1,6 +1,6 @@
 import {IsInt, IsNotEmpty, IsOptional, IsString} from "class-validator";
 
-export class Product {
+export class UpdateProductDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
