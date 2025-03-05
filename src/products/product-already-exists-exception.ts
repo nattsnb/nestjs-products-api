@@ -1,8 +1,9 @@
-import {ConflictException} from "@nestjs/common";
-import {ProductDto} from "./product.dto";
+import { ConflictException } from '@nestjs/common';
+import { ProductDto } from './product.dto';
+import { Product } from './product';
 
 export class ProductAlreadyExistsException extends ConflictException {
-  constructor(product: ProductDto) {
-    super(`Product with ${product.name} already exists.`);
+  constructor() {
+    super(`Product with this name already exists.`);
   }
 }

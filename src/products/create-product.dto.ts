@@ -1,4 +1,4 @@
-import {IsInt, IsNotEmpty, IsString} from "class-validator";
+import {IsInt, IsNotEmpty, IsString, Max, Min} from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -6,10 +6,13 @@ export class CreateProductDto {
   name: string;
 
   @IsInt()
-  @IsNotEmpty()
+
+  @Max(2147483647)
+  @Min(0)
   priceInPLNgr: number;
 
   @IsInt()
-  @IsNotEmpty()
+  @Max(2147483647)
+  @Min(0)
   quantity: number;
 }

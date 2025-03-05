@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import {ProductsModule} from "./products/products.module";
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [

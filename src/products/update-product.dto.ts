@@ -1,18 +1,20 @@
-import {IsInt, IsNotEmpty, IsOptional, IsString} from "class-validator";
+import {IsInt, IsNotEmpty, IsOptional, IsString, Max, Min} from 'class-validator';
 
 export class UpdateProductDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name?: string;
 
   @IsOptional()
   @IsInt()
-  @IsNotEmpty()
-  priceInPLNgr: number;
+  @Max(2147483647)
+  @Min(0)
+  priceInPLNgr?: number;
 
   @IsOptional()
   @IsInt()
-  @IsNotEmpty()
-  quantity: number;
+  @Max(2147483647)
+  @Min(0)
+  quantity?: number;
 }
