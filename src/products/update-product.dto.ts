@@ -1,4 +1,13 @@
-import {IsInt, IsNotEmpty, IsOptional, IsString, Max, Min} from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdateProductDto {
   @IsOptional()
@@ -13,8 +22,7 @@ export class UpdateProductDto {
   priceInPLNgr?: number;
 
   @IsOptional()
-  @IsInt()
-  @Max(2147483647)
-  @Min(0)
-  quantity?: number;
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === true)
+  isInStock?: boolean;
 }

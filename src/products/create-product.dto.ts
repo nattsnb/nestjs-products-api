@@ -1,4 +1,12 @@
-import {IsInt, IsNotEmpty, IsString, Max, Min} from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateProductDto {
   @IsString()
@@ -6,13 +14,11 @@ export class CreateProductDto {
   name: string;
 
   @IsInt()
-
   @Max(2147483647)
   @Min(0)
   priceInPLNgr: number;
 
-  @IsInt()
-  @Max(2147483647)
-  @Min(0)
-  quantity: number;
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === true)
+  isInStock: boolean;
 }
