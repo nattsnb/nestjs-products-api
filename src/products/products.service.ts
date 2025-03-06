@@ -3,8 +3,8 @@ import { PrismaService } from '../database/prisma.service';
 import { ProductNotFoundException } from './product-not-found-exception';
 import { Prisma } from '@prisma/client';
 import { PrismaError } from '../database/prisma-error.enum';
-import { UpdateProductDto } from './update-product.dto';
-import { CreateProductDto } from './create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto } from './dto/create-product.dto';
 import { ProductAlreadyExistsException } from './product-already-exists-exception';
 
 @Injectable()
