@@ -1,0 +1,46 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { SignInDto } from './dto/sign-in.dto';
+import { UserService } from '../user/user.service';
+import { compare, hash } from 'bcrypt';
+import { LogInDto } from './dto/log-in.dto';
+import { WrongCredentialsException } from './wrong-credentials-exception';
+
+@Injectable()
+export class AuthenticationService {
+  constructor(private readonly userService: UserService) {}
+
+  async signIn(singUpData: SignInDto) {
+    const hashedPassword = await hash(singUpData.password, 10);
+    return this.userService.create({
+      email: singUpData.email,
+      name: singUpData.name,
+      password: hashedPassword,
+    });
+  }
+
+  private async getUserByEmail(email: string) {
+    try {
+      return await this.userService.getByEmail(email);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new WrongCredentialsException();
+      }
+      throw error;
+    }
+  }
+
+  private async verifyPassword(
+    plainTextPassword: string,
+    hashedPassword: string,
+  ) {
+    const isPasswordMatching = await compare(plainTextPassword, hashedPassword);
+    if (!isPasswordMatching) {
+      throw new WrongCredentialsException();
+    }
+  }
+
+  async getAuthenticatedUser(logInData: LogInDto) {
+    const user = await this.getUserByEmail(logInData.email);
+    return await this.verifyPassword(logInData.password, user.password);
+  }
+}
