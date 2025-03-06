@@ -1,5 +1,5 @@
 export class ProductDto {
   name: string;
-  priceInPLNgr: number;
+  priceInPLNgr: string;
   isInStock: boolean;
 }

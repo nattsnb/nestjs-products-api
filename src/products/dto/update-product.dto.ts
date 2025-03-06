@@ -16,10 +16,9 @@ export class UpdateProductDto {
   name?: string;
 
   @IsOptional()
-  @IsInt()
-  @Max(2147483647)
-  @Min(0)
-  priceInPLNgr?: number;
+  @IsString()
+  @IsNotEmpty()
+  priceInPLNgr?: string;
 
   @IsOptional()
   @IsBoolean()

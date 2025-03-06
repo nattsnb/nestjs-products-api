@@ -13,10 +13,9 @@ export class CreateProductDto {
   @IsNotEmpty()
   name: string;
 
-  @IsInt()
-  @Max(2147483647)
-  @Min(0)
-  priceInPLNgr: number;
+  @IsString()
+  @IsNotEmpty()
+  priceInPLNgr: string;
 
   @IsBoolean()
   @Transform(({ value }) => value === 'true' || value === true)
