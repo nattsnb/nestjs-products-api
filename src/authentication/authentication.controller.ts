@@ -14,12 +14,15 @@ import { LogInDto } from './dto/log-in.dto';
 import { Response } from 'express';
 import { JwtAuthenticationGuard } from './jwt-authentication.guard';
 import { RequestWithUser } from './request-with-user';
+import { TransformPlainToInstance } from 'class-transformer';
+import { AuthenticationResponseDto } from './dto/authentication-response.dto';
 
 @Controller('authentication')
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @Post('sign-up')
+  @TransformPlainToInstance(AuthenticationResponseDto)
   async signIn(@Body() signInData: SignInDto) {
     return await this.authenticationService.signIn(signInData);
   }
