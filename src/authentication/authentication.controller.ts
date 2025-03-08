@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
-import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 import { LogInDto } from './dto/log-in.dto';
 import { Response } from 'express';
 import { JwtAuthenticationGuard } from './jwt-authentication.guard';
@@ -23,8 +23,8 @@ export class AuthenticationController {
 
   @Post('sign-up')
   @TransformPlainToInstance(AuthenticationResponseDto)
-  async signIn(@Body() signInData: SignInDto) {
-    return await this.authenticationService.signIn(signInData);
+  async signUp(@Body() signUpData: SignUpDto) {
+    return await this.authenticationService.signUp(signUpData);
   }
 
   @HttpCode(200)
