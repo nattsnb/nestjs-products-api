@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 import { UserService } from '../user/user.service';
 import { compare, hash } from 'bcrypt';
 import { LogInDto } from './dto/log-in.dto';
@@ -16,7 +16,7 @@ export class AuthenticationService {
     private readonly configService: ConfigService,
   ) {}
 
-  async signIn(singUpData: SignInDto) {
+  async signUp(singUpData: SignUpDto) {
     const hashedPassword = await hash(singUpData.password, 10);
     return this.userService.create({
       email: singUpData.email,
