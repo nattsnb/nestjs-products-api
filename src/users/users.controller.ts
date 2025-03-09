@@ -7,8 +7,8 @@ import { TransformPlainToInstance } from 'class-transformer';
 import { AuthenticationResponseDto } from '../authentication/dto/authentication-response.dto';
 
 @Controller('users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+export class UsersController {
+  constructor(private readonly userService: UsersService) {}
 
   @UseGuards(JwtAuthenticationGuard)
   @Patch('phone')
