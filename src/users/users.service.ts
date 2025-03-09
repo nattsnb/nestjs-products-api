@@ -6,7 +6,7 @@ import { PrismaError } from '../database/prisma-error.enum';
 import { UserNotFoundException } from './user-not-found-exception';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(user: UserDto) {
