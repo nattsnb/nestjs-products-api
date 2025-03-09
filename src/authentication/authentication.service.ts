@@ -18,11 +18,12 @@ export class AuthenticationService {
 
   async signUp(singUpData: SignUpDto) {
     const hashedPassword = await hash(singUpData.password, 10);
-    return this.userService.create({
+    return await this.userService.create({
       email: singUpData.email,
       name: singUpData.name,
       password: hashedPassword,
       phoneNumber: singUpData.phoneNumber,
+      address: singUpData.address,
     });
   }
 

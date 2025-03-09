@@ -12,7 +12,18 @@ export class UserService {
   async create(user: UserDto) {
     try {
       return await this.prismaService.user.create({
-        data: user,
+        data: {
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          phoneNumber: user.phoneNumber,
+          address: {
+            create: user.address,
+          },
+        },
+        include: {
+          address: true,
+        },
       });
     } catch (error) {
       if (
@@ -29,6 +40,9 @@ export class UserService {
       where: {
         email,
       },
+      include: {
+        address: true,
+      },
     });
     if (!user) {
       throw new UserNotFoundException();
@@ -40,6 +54,9 @@ export class UserService {
     const user = await this.prismaService.user.findUnique({
       where: {
         id,
+      },
+      include: {
+        address: true,
       },
     });
     if (!user) {

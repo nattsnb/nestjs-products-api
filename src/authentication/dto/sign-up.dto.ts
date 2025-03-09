@@ -1,11 +1,17 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsPhoneNumber,
   IsString,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
+import { Address } from '@prisma/client';
+import { CanBeUndefinied } from '../../Utilities/can-be-undefinied';
+import { Type } from 'class-transformer';
+import { AddressDto } from './address.dto';
 
 export class SignUpDto {
   @IsString()
@@ -25,4 +31,10 @@ export class SignUpDto {
   @IsOptional()
   @IsPhoneNumber()
   phoneNumber: string;
+
+  @CanBeUndefinied()
+  @Type(() => AddressDto)
+  @IsObject()
+  @ValidateNested()
+  address?: Address;
 }
