@@ -16,11 +16,11 @@ export class AuthenticationService {
     private readonly configService: ConfigService,
   ) {}
 
-  async signUp(singUpData: SignUpDto) {
-    const hashedPassword = await hash(singUpData.password, 10);
+  async signUp(signUpData: SignUpDto) {
+    const hashedPassword = await hash(signUpData.password, 10);
     return this.userService.create({
-      email: singUpData.email,
-      name: singUpData.name,
+      email: signUpData.email,
+      name: signUpData.name,
       password: hashedPassword,
       phoneNumber: singUpData.phoneNumber,
     });
