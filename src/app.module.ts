@@ -3,11 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ProductsModule } from './products/products.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
     ProductsModule,
     AuthenticationModule,
+    CategoriesModule,
     ConfigModule.forRoot({
       validationSchema: Joi.object({
         DATABASE_URL: Joi.string().required(),

@@ -8,13 +8,14 @@ datasource db {
 }
 
 model Product {
-  id           Int     @id @default(autoincrement())
-  name         String  @unique
+  id           Int        @id @default(autoincrement())
+  name         String     @unique
   priceInPLNgr String
-  isInStock    Boolean @default(false)
+  isInStock    Boolean    @default(false)
   description  String
-  user         User    @relation(fields: [userId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
   userId       Int
+  categories   Category[]
 }
 
 model User {
@@ -34,4 +35,10 @@ model Address {
   city    String
   country String
   user    User[]
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
 }
