@@ -16,13 +16,13 @@ import { JwtAuthenticationGuard } from './jwt-authentication.guard';
 import { RequestWithUser } from './request-with-user';
 import { TransformPlainToInstance } from 'class-transformer';
 import { AuthenticationResponseDto } from './dto/authentication-response.dto';
-import { UserService } from '../user/user.service';
+import {UsersService} from "../users/users.service";
 
 @Controller('authentication')
 export class AuthenticationController {
   constructor(
     private readonly authenticationService: AuthenticationService,
-    private readonly userService: UserService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Post('sign-up')
@@ -56,6 +56,6 @@ export class AuthenticationController {
   @Get()
   @TransformPlainToInstance(AuthenticationResponseDto)
   async authenticate(@Req() request: RequestWithUser) {
-    return this.userService.getById(request.user.id);
+    return this.usersService.getById(request.user.id);
   }
 }
