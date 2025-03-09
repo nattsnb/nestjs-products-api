@@ -1,5 +1,5 @@
 import { Body, Controller, Patch, Req, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
 import { RequestWithUser } from '../authentication/request-with-user';
 import { EditPhoneNumberDto } from './edit-phone-number.dto';
