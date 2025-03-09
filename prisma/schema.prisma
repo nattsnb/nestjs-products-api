@@ -19,14 +19,16 @@ model Product {
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
-  password    String
-  name        String
-  phoneNumber String?
-  address     Address?  @relation(fields: [addressId], references: [id])
-  addressId   Int?      @unique
-  products    Product[]
+  id             Int           @id @default(autoincrement())
+  email          String        @unique
+  password       String
+  name           String
+  phoneNumber    String?
+  address        Address?      @relation(fields: [addressId], references: [id])
+  addressId      Int?          @unique
+  products       Product[]
+  profileImage   ProfileImage? @relation(fields: [profileImageId], references: [id])
+  profileImageId Int?          @unique
 }
 
 model Address {
@@ -34,11 +36,17 @@ model Address {
   street  String
   city    String
   country String
-  user    User[]
+  user    User?
 }
 
 model Category {
   id       Int       @id @default(autoincrement())
   name     String
   products Product[]
+}
+
+model ProfileImage {
+  id   Int    @id @default(autoincrement())
+  url  String
+  user User?
 }
