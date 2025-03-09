@@ -13,16 +13,19 @@ model Product {
   priceInPLNgr String
   isInStock    Boolean @default(false)
   description  String
+  user         User    @relation(fields: [userId], references: [id])
+  userId       Int
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
   password    String
   name        String
   phoneNumber String?
-  address     Address? @relation(fields: [addressId], references: [id])
-  addressId   Int?     @unique
+  address     Address?  @relation(fields: [addressId], references: [id])
+  addressId   Int?      @unique
+  products    Product[]
 }
 
 model Address {
@@ -30,5 +33,5 @@ model Address {
   street  String
   city    String
   country String
-  User    User[]
+  user    User[]
 }

@@ -27,10 +27,20 @@ export class ProductsService {
     return product;
   }
 
-  async create(product: CreateProductDto) {
+  async create(product: CreateProductDto, userId: number) {
     try {
       return await this.prismaService.product.create({
-        data: product,
+        data: {
+          name: product.name,
+          priceInPLNgr: product.priceInPLNgr,
+          isInStock: product.isInStock,
+          description: product.description,
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
       });
     } catch (error) {
       if (
