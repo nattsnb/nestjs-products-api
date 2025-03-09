@@ -42,6 +42,7 @@ export class UserService {
       },
       include: {
         address: true,
+        products: true,
       },
     });
     if (!user) {
@@ -57,6 +58,7 @@ export class UserService {
       },
       include: {
         address: true,
+        products: true,
       },
     });
     if (!user) {

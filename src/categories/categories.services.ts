@@ -18,6 +18,9 @@ export class CategoriesServices {
       where: {
         id,
       },
+      include: {
+        products: true,
+      },
     });
     if (!category) {
       throw new NotFoundException();

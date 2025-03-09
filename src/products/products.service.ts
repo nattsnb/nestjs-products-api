@@ -20,6 +20,10 @@ export class ProductsService {
       where: {
         id,
       },
+      include: {
+        user: true,
+        categories: true,
+      },
     });
     if (!product) {
       throw new ProductNotFoundException(id);
