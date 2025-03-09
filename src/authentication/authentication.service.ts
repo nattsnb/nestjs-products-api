@@ -22,7 +22,7 @@ export class AuthenticationService {
       email: signUpData.email,
       name: signUpData.name,
       password: hashedPassword,
-      phoneNumber: singUpData.phoneNumber,
+      phoneNumber: signUpData.phoneNumber,
     });
   }
 
