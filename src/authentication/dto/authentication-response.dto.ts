@@ -10,7 +10,7 @@ export class AuthenticationResponseDto implements User {
     if (!phoneNumber) {
       return null;
     }
-    const numberLength = phoneNumber.length();
+    const numberLength = phoneNumber.length;
     const visiblePart = phoneNumber.substring(numberLength - 3, numberLength);
     return `${'*'.repeat(numberLength - 3)}${visiblePart}`;
   })

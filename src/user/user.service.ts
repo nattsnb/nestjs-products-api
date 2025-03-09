@@ -47,4 +47,22 @@ export class UserService {
     }
     return user;
   }
+
+  async editPhoneNumber(id: number, phoneNumber: string) {
+    try {
+      await this.prismaService.user.update({
+        data: {
+          phoneNumber: {
+            set: phoneNumber,
+          },
+        },
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+    return this.getById(id);
+  }
 }

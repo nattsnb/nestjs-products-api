@@ -29,6 +29,7 @@ export class AuthenticationController {
 
   @HttpCode(200)
   @Post('log-in')
+  @TransformPlainToInstance(AuthenticationResponseDto)
   async logIn(
     @Body() logInData: LogInDto,
     @Res({ passthrough: true }) response: Response,
@@ -49,6 +50,7 @@ export class AuthenticationController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Get()
+  @TransformPlainToInstance(AuthenticationResponseDto)
   authenticate(@Req() request: RequestWithUser) {
     return request.user;
   }
