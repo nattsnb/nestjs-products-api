@@ -50,6 +50,7 @@ export class UsersService {
         address: true,
         products: true,
         comments: true,
+        books: true,
       },
     });
     if (!user) {
