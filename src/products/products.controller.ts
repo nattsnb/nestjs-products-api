@@ -45,12 +45,12 @@ export class ProductsController {
     return this.productsService.create(product, request.user.id);
   }
 
-  @Patch('changeOwnership/:oldUserId/:newUserId')
+  @Patch()
   changeOwnership(
-    @Param('oldUserId', ParseIntPipe) oldUserId: number,
-    @Param('newUserId', ParseIntPipe) newUserId: number,
+    @Query('previousAuthor', ParseIntPipe) previousAuthor: number,
+    @Query('newAuthor', ParseIntPipe) newAuthor: number,
   ) {
-    return this.productsService.changeOwnership(oldUserId, newUserId);
+    return this.productsService.changeOwnership(previousAuthor, newAuthor);
   }
 
   @Patch(':id')
