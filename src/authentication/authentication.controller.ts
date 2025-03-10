@@ -16,7 +16,7 @@ import { JwtAuthenticationGuard } from './jwt-authentication.guard';
 import { RequestWithUser } from './request-with-user';
 import { TransformPlainToInstance } from 'class-transformer';
 import { AuthenticationResponseDto } from './dto/authentication-response.dto';
-import {UsersService} from "../users/users.service";
+import { UsersService } from '../users/users.service';
 
 @Controller('authentication')
 export class AuthenticationController {

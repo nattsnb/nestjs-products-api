@@ -1,4 +1,4 @@
-import { Address, User } from '@prisma/client';
+import { Address, ProfileImage, User } from '@prisma/client';
 import { Exclude, Transform } from 'class-transformer';
 
 export class AuthenticationResponseDto implements User {
@@ -7,6 +7,8 @@ export class AuthenticationResponseDto implements User {
   email: string;
   addressId: number;
   address: Address;
+  profileImage: ProfileImage;
+  profileImageId: number;
 
   @Transform(({ value: phoneNumber }) => {
     if (!phoneNumber) {

@@ -4,6 +4,9 @@ import { UserDto } from './user.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaError } from '../database/prisma-error.enum';
 import { UserNotFoundException } from './user-not-found-exception';
+import { ProfileImageDto } from '../profileImages/profile-image.dto';
+import { ProfileImagesService } from '../profileImages/profileImages.service';
+import { ProfileImageAlreadyExistsException } from '../profileImages/profile-image-already-exists-exception';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +22,9 @@ export class UsersService {
           phoneNumber: user.phoneNumber,
           address: {
             create: user.address,
+          },
+          profileImage: {
+            create: user.profileImage,
           },
         },
         include: {

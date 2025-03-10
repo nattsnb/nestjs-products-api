@@ -1,3 +1,5 @@
+import { ProfileImage } from '@prisma/client';
+
 export class UserDto {
   email: string;
   name: string;
@@ -7,5 +9,8 @@ export class UserDto {
     street: string;
     city: string;
     country: string;
+  };
+  profileImage?: {
+    url: string;
   };
 }

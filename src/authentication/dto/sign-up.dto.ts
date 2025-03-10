@@ -8,10 +8,11 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { Address } from '@prisma/client';
+import { Address, ProfileImage } from '@prisma/client';
 import { CanBeUndefinied } from '../../Utilities/can-be-undefinied';
 import { Type } from 'class-transformer';
 import { AddressDto } from './address.dto';
+import { ProfileImageDto } from '../../profileImages/profile-image.dto';
 
 export class SignUpDto {
   @IsString()
@@ -37,4 +38,10 @@ export class SignUpDto {
   @IsObject()
   @ValidateNested()
   address?: Address;
+
+  @CanBeUndefinied()
+  @Type(() => ProfileImageDto)
+  @IsObject()
+  @ValidateNested()
+  profileImage?: ProfileImage;
 }
