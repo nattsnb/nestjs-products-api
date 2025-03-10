@@ -40,11 +40,6 @@ export class UsersController {
     @Query('newAuthor') newAuthor?: string,
   ) {
     const parsedNewAuthor = newAuthor ? parseInt(newAuthor) : undefined;
-
-    // if (newAuthor && isNaN(parsedNewAuthor)) {
-    //   throw new BadRequestException("Invalid newAuthor ID. Must be a number.");
-    // }
-
     return this.userService.deleteUser(req.user.id, parsedNewAuthor);
   }
 }
