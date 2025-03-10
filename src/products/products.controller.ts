@@ -58,4 +58,14 @@ export class ProductsController {
   deleteProduct(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.delete(id);
   }
+
+  @Patch(':id/downvote')
+  downProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.downvote(id);
+  }
+
+  @Patch(':id/upvote')
+  upvoteProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.upvote(id);
+  }
 }

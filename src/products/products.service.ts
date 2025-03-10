@@ -44,6 +44,7 @@ export class ProductsService {
           priceInPLNgr: product.priceInPLNgr,
           isInStock: product.isInStock,
           description: product.description,
+          upvotes: 0,
           user: {
             connect: {
               id: userId,
@@ -122,6 +123,32 @@ export class ProductsService {
       if (deleteResponse.count !== productsIds.length) {
         throw new NotFoundException();
       }
+    });
+  }
+
+  async upvote(id: number) {
+    return this.prismaService.product.update({
+      where: {
+        id,
+      },
+      data: {
+        upvotes: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  async downvote(id: number) {
+    return this.prismaService.product.update({
+      where: {
+        id,
+      },
+      data: {
+        upvotes: {
+          decrement: 1,
+        },
+      },
     });
   }
 }

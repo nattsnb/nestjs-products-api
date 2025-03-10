@@ -8,4 +8,5 @@ export class ProductsDetailsResponseDto {
     return description.charAt(0).toUpperCase() + description.slice(1);
   })
   description: string;
+  upvote: number;
 }
