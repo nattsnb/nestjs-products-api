@@ -45,6 +45,14 @@ export class ProductsController {
     return this.productsService.create(product, request.user.id);
   }
 
+  @Patch('changeOwnership/:oldUserId/:newUserId')
+  changeOwnership(
+    @Param('oldUserId', ParseIntPipe) oldUserId: number,
+    @Param('newUserId', ParseIntPipe) newUserId: number,
+  ) {
+    return this.productsService.changeOwnership(oldUserId, newUserId);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthenticationGuard)
   updateProduct(
@@ -52,6 +60,15 @@ export class ProductsController {
     @Body() product: UpdateProductDto,
   ) {
     return this.productsService.update(id, product);
+  }
+  @Patch(':id/downvote')
+  downProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.downvote(id);
+  }
+
+  @Patch(':id/upvote')
+  upvoteProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.upvote(id);
   }
 
   @Delete('filter')
@@ -68,15 +85,5 @@ export class ProductsController {
   @UseGuards(JwtAuthenticationGuard)
   deleteProduct(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.delete(id);
-  }
-
-  @Patch(':id/downvote')
-  downProduct(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.downvote(id);
-  }
-
-  @Patch(':id/upvote')
-  upvoteProduct(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.upvote(id);
   }
 }

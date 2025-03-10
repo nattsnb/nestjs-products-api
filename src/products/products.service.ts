@@ -167,4 +167,39 @@ export class ProductsService {
 
     return `Deleted ${deleteResponse.count} products.`;
   }
+
+  async changeOwnership(oldUserId: number, newUserId: number) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const oldUser = await transactionClient.user.findUnique({
+        where: {
+          id: oldUserId,
+        },
+        include: {
+          products: true,
+        },
+      });
+      const newUser = await transactionClient.user.findUnique({
+        where: {
+          id: newUserId,
+        },
+      });
+
+      if (!oldUser || !newUser) {
+        throw new NotFoundException("At least one of the users doesn't exist.");
+      }
+
+      const productIds = oldUser.products.map((product) => product.id);
+
+      await transactionClient.product.updateMany({
+        where: {
+          id: {
+            in: productIds,
+          },
+        },
+        data: {
+          userId: newUserId,
+        },
+      });
+    });
+  }
 }
