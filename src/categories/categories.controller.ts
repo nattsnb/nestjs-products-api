@@ -41,6 +41,6 @@ export class CategoriesController {
 
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
-    return this.categoryService.deleteCategory(id);
+    return this.categoryService.deleteCategoryWihProducts(id);
   }
 }

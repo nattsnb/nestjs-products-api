@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { ProductNotFoundException } from './product-not-found-exception';
 import { Prisma } from '@prisma/client';
@@ -104,5 +108,20 @@ export class ProductsService {
       }
       throw error;
     }
+  }
+
+  async deleteMultiple(productsIds: number[]) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const deleteResponse = await this.prismaService.product.deleteMany({
+        where: {
+          id: {
+            in: productsIds,
+          },
+        },
+      });
+      if (deleteResponse.count !== productsIds.length) {
+        throw new NotFoundException();
+      }
+    });
   }
 }

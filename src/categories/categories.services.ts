@@ -4,10 +4,14 @@ import { CreateCategoryDto } from './create-category.dto';
 import { UpdateCategoryDto } from './update-category.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaError } from '../database/prisma-error.enum';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class CategoriesServices {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly productsService: ProductsService,
+  ) {}
 
   getAll() {
     return this.prismaService.category.findMany();
@@ -71,5 +75,37 @@ export class CategoriesServices {
       }
       throw error;
     }
+  }
+
+  async deleteCategoryWihProducts(categoryId: number) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const category = await transactionClient.category.findUnique({
+        where: {
+          id: categoryId,
+        },
+        include: {
+          products: true,
+        },
+      });
+      if (!category) {
+        throw new NotFoundException();
+      }
+
+      const productIds = category.products.map((product) => product.id);
+
+      await transactionClient.product.deleteMany({
+        where: {
+          id: {
+            in: productIds,
+          },
+        },
+      });
+
+      await transactionClient.category.delete({
+        where: {
+          id: categoryId,
+        },
+      });
+    });
   }
 }
