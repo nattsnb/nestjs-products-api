@@ -43,7 +43,7 @@ export class CommentsController {
     return this.commentsService.deleteComment(id);
   }
 
-  @Post('')
+  @Post()
   @UseGuards(JwtAuthenticationGuard)
   createComment(@Req() req: RequestWithUser, @Body() comment: CommentDto) {
     return this.commentsService.createComment(req.user.id, comment);

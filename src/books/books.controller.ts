@@ -39,7 +39,7 @@ export class BooksController {
     return this.booksService.deleteBook(id);
   }
 
-  @Post('')
+  @Post()
   createComment(@Body() book: BookDto) {
     return this.booksService.createBook(book);
   }
