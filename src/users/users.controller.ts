@@ -1,4 +1,14 @@
-import { Body, Controller, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
 import { RequestWithUser } from '../authentication/request-with-user';
@@ -21,5 +31,20 @@ export class UsersController {
       req.user.id,
       phoneNumberObject.phoneNumber,
     );
+  }
+
+  @Delete()
+  @UseGuards(JwtAuthenticationGuard)
+  deleteUser(
+    @Req() req: RequestWithUser,
+    @Query('newAuthor') newAuthor?: string,
+  ) {
+    const parsedNewAuthor = newAuthor ? parseInt(newAuthor) : undefined;
+
+    // if (newAuthor && isNaN(parsedNewAuthor)) {
+    //   throw new BadRequestException("Invalid newAuthor ID. Must be a number.");
+    // }
+
+    return this.userService.deleteUser(req.user.id, parsedNewAuthor);
   }
 }

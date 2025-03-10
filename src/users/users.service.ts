@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { UserDto } from './user.dto';
 import { Prisma } from '@prisma/client';
@@ -91,5 +95,50 @@ export class UsersService {
       throw error;
     }
     return this.getById(id);
+  }
+
+  async deleteUser(userToDeleteId: number, newUserId?: number) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const user = await transactionClient.user.findUnique({
+        where: {
+          id: userToDeleteId,
+        },
+        include: {
+          products: true,
+        },
+      });
+
+      if (!user) {
+        throw new NotFoundException("User doesn't exist.");
+      }
+
+      const productIds = user.products.map((product) => product.id);
+
+      if (newUserId) {
+        await transactionClient.product.updateMany({
+          where: {
+            id: {
+              in: productIds,
+            },
+          },
+          data: {
+            userId: newUserId,
+          },
+        });
+      } else {
+        await transactionClient.product.deleteMany({
+          where: {
+            id: {
+              in: productIds,
+            },
+          },
+        });
+      }
+      await transactionClient.user.delete({
+        where: {
+          id: userToDeleteId,
+        },
+      });
+    });
   }
 }
