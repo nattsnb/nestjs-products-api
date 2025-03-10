@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -51,6 +52,16 @@ export class ProductsController {
     @Body() product: UpdateProductDto,
   ) {
     return this.productsService.update(id, product);
+  }
+
+  @Delete('filter')
+  @UseGuards(JwtAuthenticationGuard)
+  deleteFilteredProducts(
+    @Query('upvotesFewerThan', ParseIntPipe) upvotesFewerThan: number,
+  ) {
+    return this.productsService.deleteAllArticlesWithUpvoteLowerThan(
+      upvotesFewerThan,
+    );
   }
 
   @Delete(':id')

@@ -151,4 +151,20 @@ export class ProductsService {
       },
     });
   }
+
+  async deleteAllArticlesWithUpvoteLowerThan(threshold: number) {
+    const deleteResponse = await this.prismaService.product.deleteMany({
+      where: {
+        upvotes: {
+          lt: threshold,
+        },
+      },
+    });
+
+    if (deleteResponse.count === 0) {
+      throw new NotFoundException('Not product matches criteria.');
+    }
+
+    return `Deleted ${deleteResponse.count} products.`;
+  }
 }
