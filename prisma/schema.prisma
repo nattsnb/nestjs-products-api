@@ -29,6 +29,7 @@ model User {
   products       Product[]
   profileImage   ProfileImage? @relation(fields: [profileImageId], references: [id])
   profileImageId Int?          @unique
+  comments       Comment[]
 }
 
 model Address {
@@ -49,4 +50,11 @@ model ProfileImage {
   id   Int    @id @default(autoincrement())
   url  String
   user User?
+}
+
+model Comment {
+  id     Int    @id @default(autoincrement())
+  text   String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int
 }

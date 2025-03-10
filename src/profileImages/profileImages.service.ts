@@ -51,7 +51,7 @@ export class ProfileImagesService {
 
   async deleteProfileImage(id: number) {
     try {
-      return await this.prismaService.category.delete({
+      return await this.prismaService.profileImage.delete({
         where: {
           id,
         },

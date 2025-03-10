@@ -49,6 +49,7 @@ export class UsersService {
       include: {
         address: true,
         products: true,
+        comments: true,
       },
     });
     if (!user) {

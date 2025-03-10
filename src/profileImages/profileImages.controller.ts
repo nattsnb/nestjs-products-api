@@ -8,11 +8,9 @@ import {
   Patch,
   Post,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { ProfileImagesService } from './profileImages.service';
 import { UpdateProfileImageDto } from './update-profile-image.dto';
-import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
 import { RequestWithUser } from '../authentication/request-with-user';
 import { ProfileImageDto } from './profile-image.dto';
 
@@ -43,7 +41,6 @@ export class ProfileImagesController {
     return this.profileImagesService.deleteProfileImage(id);
   }
 
-  @UseGuards(JwtAuthenticationGuard)
   @Post('')
   createUserImage(
     @Req() req: RequestWithUser,
