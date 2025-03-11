@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { CategoriesServices } from './categories.services';
+import { CategoriesService } from './categories.service';
 import { PrismaService } from '../database/prisma.service';
 import { ProductsService } from '../products/products.service';
 import { NotFoundException } from '@nestjs/common';
@@ -7,7 +7,7 @@ import { PrismaError } from '../database/prisma-error.enum';
 import { Prisma } from '@prisma/client';
 
 describe('The CategoriesServices', () => {
-  let categoriesServices: CategoriesServices;
+  let categoriesService: CategoriesService;
   let prismaServiceMock: {
     category: {
       findMany: jest.Mock;
@@ -39,18 +39,18 @@ describe('The CategoriesServices', () => {
     };
     const module = await Test.createTestingModule({
       providers: [
-        CategoriesServices,
+        CategoriesService,
         { provide: PrismaService, useValue: prismaServiceMock },
         { provide: ProductsService, useValue: productsServiceMock },
       ],
     }).compile();
-    categoriesServices = module.get(CategoriesServices);
+    categoriesService = module.get(CategoriesService);
   });
   describe('when getAll is called', () => {
     it('should return a list of categories', async () => {
       const categories = [{ id: 1, name: 'Test Category' }];
       prismaServiceMock.category.findMany.mockResolvedValue(categories);
-      const result = await categoriesServices.getAll();
+      const result = await categoriesService.getAll();
       expect(result).toEqual(categories);
     });
   });
@@ -58,12 +58,12 @@ describe('The CategoriesServices', () => {
     it('should return a category if found', async () => {
       const category = { id: 1, name: 'Test Category', products: [] };
       prismaServiceMock.category.findUnique.mockResolvedValue(category);
-      const result = await categoriesServices.getById(1);
+      const result = await categoriesService.getById(1);
       expect(result).toEqual(category);
     });
     it('should throw NotFoundException if category is not found', async () => {
       prismaServiceMock.category.findUnique.mockResolvedValue(null);
-      await expect(categoriesServices.getById(1)).rejects.toThrow(
+      await expect(categoriesService.getById(1)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -73,7 +73,7 @@ describe('The CategoriesServices', () => {
       const categoryDto = { name: 'New Category' };
       const createdCategory = { id: 1, ...categoryDto };
       prismaServiceMock.category.create.mockResolvedValue(createdCategory);
-      const result = await categoriesServices.create(categoryDto);
+      const result = await categoriesService.create(categoryDto);
       expect(result).toEqual(createdCategory);
     });
   });
@@ -81,7 +81,7 @@ describe('The CategoriesServices', () => {
     it('should update a category', async () => {
       const updatedCategory = { id: 1, name: 'Updated Category' };
       prismaServiceMock.category.update.mockResolvedValue(updatedCategory);
-      const result = await categoriesServices.updateCategory(1, {
+      const result = await categoriesService.updateCategory(1, {
         name: 'Updated Category',
       });
       expect(result).toEqual(updatedCategory);
@@ -94,14 +94,14 @@ describe('The CategoriesServices', () => {
         }),
       );
       await expect(
-        categoriesServices.updateCategory(1, { name: 'Invalid' }),
+        categoriesService.updateCategory(1, { name: 'Invalid' }),
       ).rejects.toThrow(NotFoundException);
     });
   });
   describe('when deleteCategory is called', () => {
     it('should delete a category', async () => {
       prismaServiceMock.category.delete.mockResolvedValue({ id: 1 });
-      const result = await categoriesServices.deleteCategory(1);
+      const result = await categoriesService.deleteCategory(1);
       expect(result).toEqual({ id: 1 });
     });
     it('should throw NotFoundException if category does not exist', async () => {
@@ -111,7 +111,7 @@ describe('The CategoriesServices', () => {
           clientVersion: '6.4.1',
         }),
       );
-      await expect(categoriesServices.deleteCategory(1)).rejects.toThrow(
+      await expect(categoriesService.deleteCategory(1)).rejects.toThrow(
         NotFoundException,
       );
     });
