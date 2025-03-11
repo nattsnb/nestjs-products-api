@@ -7,7 +7,7 @@ import { PrismaError } from '../database/prisma-error.enum';
 import { ProductsService } from '../products/products.service';
 
 @Injectable()
-export class CategoriesServices {
+export class CategoriesService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly productsService: ProductsService,
