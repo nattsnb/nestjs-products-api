@@ -8,13 +8,13 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { CategoriesServices } from './categories.services';
+import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './create-category.dto';
 import { UpdateCategoryDto } from './update-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoryService: CategoriesServices) {}
+  constructor(private readonly categoryService: CategoriesService) {}
 
   @Get()
   getAll() {
