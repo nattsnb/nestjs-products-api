@@ -1,6 +1,6 @@
 import { AuthenticationService } from './authentication.service';
-import {ConfigModule, ConfigService} from '@nestjs/config';
-import {JwtModule, JwtService} from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { DatabaseModule } from '../database/database.module';
 import { UsersModule } from '../users/users.module';
 import { Test } from '@nestjs/testing';
@@ -8,8 +8,8 @@ import { UsersService } from '../users/users.service';
 import { User } from '@prisma/client';
 import { hash } from 'bcrypt';
 import { WrongCredentialsException } from './wrong-credentials-exception';
-import {ConflictException, NotFoundException} from '@nestjs/common';
-import {SignUpDto} from "./dto/sign-up.dto";
+import { ConflictException, NotFoundException } from '@nestjs/common';
+import { SignUpDto } from './dto/sign-up.dto';
 
 describe('The AuthenticationService', () => {
   let userData: User;
@@ -82,8 +82,10 @@ describe('The AuthenticationService', () => {
       });
       it('should return a valid authentication cookie', () => {
         const cookie = authenticationService.getCookieWithJwtToken(userId);
-        expect(cookie).toBe(`Authentication=${token}; HttpOnly; Path=/; Max-Age=43200`);
-      })
+        expect(cookie).toBe(
+          `Authentication=${token}; HttpOnly; Path=/; Max-Age=43200`,
+        );
+      });
     });
     describe('and JWT_EXPIRATION_TIME is missing', () => {
       beforeEach(() => {
@@ -92,7 +94,9 @@ describe('The AuthenticationService', () => {
       });
       it('should return a cookie with no Max-Age', () => {
         const cookie = authenticationService.getCookieWithJwtToken(1);
-        expect(cookie).toBe(`Authentication=mockedJwtToken; HttpOnly; Path=/; Max-Age=`);
+        expect(cookie).toBe(
+          `Authentication=mockedJwtToken; HttpOnly; Path=/; Max-Age=`,
+        );
       });
     });
     describe('and jwtService.sign() fails', () => {
@@ -102,7 +106,9 @@ describe('The AuthenticationService', () => {
         });
       });
       it('should throw an error', () => {
-        expect(() => authenticationService.getCookieWithJwtToken(1)).toThrow('JWT signing failed');
+        expect(() => authenticationService.getCookieWithJwtToken(1)).toThrow(
+          'JWT signing failed',
+        );
       });
     });
     describe('and configService.get() returns incorrect values', () => {
@@ -111,21 +117,27 @@ describe('The AuthenticationService', () => {
         const token = 'mockedJwtToken';
         jwtServiceMock.sign = jest.fn().mockReturnValue(token);
         const cookie = authenticationService.getCookieWithJwtToken(1);
-        expect(cookie).toBe(`Authentication=${token}; HttpOnly; Path=/; Max-Age=`);
+        expect(cookie).toBe(
+          `Authentication=${token}; HttpOnly; Path=/; Max-Age=`,
+        );
       });
       it('should handle NaN expiration time gracefully', () => {
         configServiceMock.get = jest.fn().mockReturnValue(NaN);
         const token = 'mockedJwtToken';
         jwtServiceMock.sign = jest.fn().mockReturnValue(token);
         const cookie = authenticationService.getCookieWithJwtToken(1);
-        expect(cookie).toBe(`Authentication=${token}; HttpOnly; Path=/; Max-Age=NaN`);
+        expect(cookie).toBe(
+          `Authentication=${token}; HttpOnly; Path=/; Max-Age=NaN`,
+        );
       });
       it('should handle empty string expiration time gracefully', () => {
         configServiceMock.get = jest.fn().mockReturnValue('');
         const token = 'mockedJwtToken';
         jwtServiceMock.sign = jest.fn().mockReturnValue(token);
         const cookie = authenticationService.getCookieWithJwtToken(1);
-        expect(cookie).toBe(`Authentication=${token}; HttpOnly; Path=/; Max-Age=`);
+        expect(cookie).toBe(
+          `Authentication=${token}; HttpOnly; Path=/; Max-Age=`,
+        );
       });
     });
   });
@@ -144,7 +156,9 @@ describe('The AuthenticationService', () => {
     });
     describe('an invalid email is provided', () => {
       beforeEach(() => {
-        (userServiceMock.getByEmail as jest.Mock).mockRejectedValue(new NotFoundException());
+        (userServiceMock.getByEmail as jest.Mock).mockRejectedValue(
+          new NotFoundException(),
+        );
       });
       it('should throw the BadRequestException', async () => {
         return expect(async () => {
@@ -168,11 +182,11 @@ describe('The AuthenticationService', () => {
           id: 1,
           street: 'Test Street',
           city: 'Test City',
-          country: 'PL'
+          country: 'PL',
         },
         profileImage: {
           id: 1,
-          url: 'http://test.com/image.jpg'
+          url: 'http://test.com/image.jpg',
         },
       };
     });
@@ -192,8 +206,12 @@ describe('The AuthenticationService', () => {
     });
     describe('when a user tries to sign up with an existing email', () => {
       it('should throw ConflictException', async () => {
-        (userServiceMock.create as jest.Mock).mockRejectedValue(new ConflictException());
-        await expect(authenticationService.signUp(signUpData)).rejects.toThrow(ConflictException);
+        (userServiceMock.create as jest.Mock).mockRejectedValue(
+          new ConflictException(),
+        );
+        await expect(authenticationService.signUp(signUpData)).rejects.toThrow(
+          ConflictException,
+        );
       });
     });
     describe('when a user signs up without optional fields', () => {
@@ -219,17 +237,23 @@ describe('The AuthenticationService', () => {
         (userServiceMock.create as jest.Mock).mockResolvedValue(mockUser);
         const result = await authenticationService.signUp(signUpData);
         expect(result).toBeDefined();
-        expect(result).toEqual(expect.objectContaining({
-          id: 1,
-          email: signUpData.email,
-          name: signUpData.name
-        }));
+        expect(result).toEqual(
+          expect.objectContaining({
+            id: 1,
+            email: signUpData.email,
+            name: signUpData.name,
+          }),
+        );
       });
     });
     describe('when userService.create() throws an error', () => {
       it('should not return the hashed password if user creation fails', async () => {
-        (userServiceMock.create as jest.Mock).mockRejectedValue(new Error('DB error'));
-        await expect(authenticationService.signUp(signUpData)).rejects.toThrow('DB error');
+        (userServiceMock.create as jest.Mock).mockRejectedValue(
+          new Error('DB error'),
+        );
+        await expect(authenticationService.signUp(signUpData)).rejects.toThrow(
+          'DB error',
+        );
       });
     });
   });
