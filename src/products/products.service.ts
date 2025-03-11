@@ -40,6 +40,7 @@ export class ProductsService {
           priceInPLNgr: product.priceInPLNgr,
           isInStock: product.isInStock,
           description: product.description,
+          upvotes: 0,
           user: {
             connect: {
               id: userId,
