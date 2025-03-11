@@ -1,6 +1,6 @@
 import { AuthenticationService } from './authentication.service';
-import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import {ConfigModule, ConfigService} from '@nestjs/config';
+import {JwtModule, JwtService} from '@nestjs/jwt';
 import { DatabaseModule } from '../database/database.module';
 import { UsersModule } from '../users/users.module';
 import { Test } from '@nestjs/testing';
@@ -14,11 +14,15 @@ describe('The AuthenticationService', () => {
   let userData: User;
   let password: string;
   let authenticationService: AuthenticationService;
+  let jwtServiceMock: JwtService;
+  let configServiceMock: ConfigService;
   let getBtyEmailMock: jest.Mock;
   beforeEach(async () => {
     password = 'strongPassword123';
     const hashedPassword = await hash(password, 10);
     getBtyEmailMock = jest.fn();
+    jwtServiceMock = new JwtService({ secret: 'secret key' });
+    configServiceMock = new ConfigService();
     userData = {
       id: 1,
       email: 'john.smith@gmail.com',
@@ -31,6 +35,14 @@ describe('The AuthenticationService', () => {
     const module = await Test.createTestingModule({
       providers: [
         AuthenticationService,
+        {
+          provide: JwtService,
+          useValue: jwtServiceMock,
+        },
+        {
+          provide: ConfigService,
+          useValue: configServiceMock,
+        },
         {
           provide: UsersService,
           useValue: {
@@ -66,6 +78,25 @@ describe('The AuthenticationService', () => {
       expect(containsHttpOnlyHeader).toBe(true);
     });
   });
+  describe('when the get getCookieWithJwtToken method is called', () => {
+    describe('and a valid userId is provided', () => {
+      let userId: number;
+      let token: string;
+      beforeEach(() => {
+        userId = 1;
+        token = 'mockedJwtToken';
+        jwtServiceMock.sign = jest.fn().mockReturnValue(token);
+        configServiceMock.get = jest.fn().mockReturnValue(43200);
+      });
+      it('should return a valid authentication cookie', () => {
+        const cookie = authenticationService.getCookieWithJwtToken(userId);
+        expect(cookie).toContain(`Authentication=${token}`);
+        expect(cookie).toContain('HttpOnly');
+        expect(cookie).toContain('Path=/');
+        expect(cookie).toContain('Max-Age=43200');
+      })
+    });
+  })
   describe('when the getAuthenticatedUser method is called', () => {
     describe('and a valid email and password are provided', () => {
       beforeEach(() => {
