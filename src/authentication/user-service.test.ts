@@ -61,6 +61,37 @@ describe('The UserService', () => {
       });
     });
   });
+  describe('when the getByEmail function is called', () => {
+    describe('and the findUnique method returns the user', () => {
+      let user: User;
+      beforeEach(() => {
+        user = {
+          id: 1,
+          email: 'john.smith@gmail.com',
+          name: 'John',
+          password: 'strongPassword123',
+          addressId: null,
+          phoneNumber: null,
+          profileImageId: null,
+        };
+        findUniqueMock.mockResolvedValue(user);
+      });
+      it('should return the user', async () => {
+        const result = await userService.getByEmail(user.email);
+        expect(result).toBe(user);
+      });
+    });
+    describe('and the findUnique method does not return the user', () => {
+      beforeEach(() => {
+        findUniqueMock.mockResolvedValue(undefined);
+      });
+      it('should throw NotFoundException', () => {
+        return expect(async () => {
+          await userService.getByEmail('john.smith@gmail.com');
+        }).rejects.toThrow(NotFoundException);
+      });
+    });
+  });
   describe('when the create function is called with valid data', () => {
     let userData: UserDto;
     beforeEach(() => {
