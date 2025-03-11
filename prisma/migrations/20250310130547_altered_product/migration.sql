@@ -1,0 +1,4 @@
+
+ALTER TABLE "Product" ADD COLUMN
+"upvotes" INTEGER NOT NULL
+DEFAULT 0;
