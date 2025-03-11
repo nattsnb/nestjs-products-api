@@ -69,7 +69,7 @@ export class BooksService {
   }
 
   async createBook(book: BookDto) {
-    const authors = book.authorIds.map((id) => ({ id }));
+    const authors = (book.authorIds ?? []).map((id) => ({ id }));
     try {
       return await this.prismaService.book.create({
         data: {

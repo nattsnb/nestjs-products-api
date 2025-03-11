@@ -90,7 +90,7 @@ export class ProductsService {
 
   async update(id: number, product: UpdateProductDto) {
     try {
-      return this.prismaService.product.update({
+      return await this.prismaService.product.update({
         data: {
           ...product,
           id: undefined,
@@ -100,12 +100,12 @@ export class ProductsService {
         },
       });
     } catch (error) {
-      const prismaError = error as Prisma.PrismaClientKnownRequestError;
-      if (prismaError.code === PrismaError.RecordDoesNotExist) {
-        throw new ProductNotFoundException(id);
-      }
-      if (prismaError.code === PrismaError.UniqueConstraintViolated) {
-        throw new ProductAlreadyExistsException();
+      console.error('Prisma update error:', error);
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException(`Product with ID ${id} not found`);
       }
       throw error;
     }
