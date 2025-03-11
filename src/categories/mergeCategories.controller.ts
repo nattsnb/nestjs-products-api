@@ -1,20 +1,9 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
-import { CategoriesServices } from './categories.services';
-import { CreateCategoryDto } from './create-category.dto';
-import { UpdateCategoryDto } from './update-category.dto';
+import { Controller, Patch } from '@nestjs/common';
+import { CategoriesService } from './categories.service';
 
 @Controller('merge-categories')
 export class MergeCategoriesController {
-  constructor(private readonly categoryService: CategoriesServices) {}
+  constructor(private readonly categoryService: CategoriesService) {}
 
   @Patch()
   mergeCategories() {
