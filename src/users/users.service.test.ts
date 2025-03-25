@@ -31,15 +31,16 @@ describe('The UsersService', () => {
   });
   describe('when the getById function is called', () => {
     describe('and the findUnique method returns the user', () => {
-      let user: Partial<User>;
+      let user: User;
       beforeEach(() => {
         user = {
           id: 1,
           email: 'john@smith.com',
           name: 'John',
           password: 'strongPassword123',
-          addressId: null,
-          phoneNumber: null,
+          addressId: 1,
+          phoneNumber: '123456789',
+          profileImageId: 1,
         };
         findUniqueMock.mockResolvedValue(user);
       });

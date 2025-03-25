@@ -41,7 +41,7 @@ describe('The AuthenticationService', () => {
   });
   describe('when the getAuthenticatedUser method is called', () => {
     describe('and a valid email and password are provided', () => {
-      let userData: Partial<User>;
+      let userData: User;
       beforeEach(async () => {
         password = 'strongPassword123';
         const hashedPassword = await hash(password, 10);
@@ -51,7 +51,8 @@ describe('The AuthenticationService', () => {
           name: 'John',
           password: hashedPassword,
           addressId: null,
-          phoneNumber: null,
+          phoneNumber: '123456789',
+          profileImageId: null,
         };
         getByEmailMock.mockResolvedValue(userData);
       });
