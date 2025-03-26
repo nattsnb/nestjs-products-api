@@ -33,12 +33,14 @@ describe('The AuthenticationService', () => {
     }).compile();
     authenticationService = await module.get(AuthenticationService);
   });
+
   describe('when the getCookieForLogOut method is called', () => {
     it('should return a correct string', () => {
       const result = authenticationService.getCookieForLogOut();
       expect(result).toBe('Authentication=; HttpOnly; Path=/; Max-Age=0');
     });
   });
+
   describe('when the getAuthenticatedUser method is called', () => {
     describe('and a valid email and password are provided', () => {
       let userData: User;
@@ -78,4 +80,14 @@ describe('The AuthenticationService', () => {
       });
     });
   });
+
+  // describe('when the signUp function is called', () => {
+  //   describe('and valid data is provided', () => {
+  //     it('should return valid user with hashed password.')
+  //   });
+  // });
+  //
+  // describe('when the getCookieWithJwtToken function is called', () => {
+  //   it('should return a string with correct JWT Token and expiration date.')
+  // });
 });

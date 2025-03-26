@@ -29,6 +29,7 @@ describe('The UsersService', () => {
     }).compile();
     usersService = await module.get(UsersService);
   });
+
   describe('when the getById function is called', () => {
     describe('and the findUnique method returns the user', () => {
       let user: User;
@@ -60,6 +61,7 @@ describe('The UsersService', () => {
       });
     });
   });
+
   describe('when the create function is called with valid data', () => {
     let userData: UserDto;
     beforeEach(() => {
@@ -103,4 +105,13 @@ describe('The UsersService', () => {
       });
     });
   });
+
+  // describe('when the getByEmail function is called', () => {
+  //   describe('and the findUnique method returns the user', () => {
+  //     it('should return the user');
+  //   })
+  //   describe('and the findUnique does not return the user', () => {
+  //     it('should throw the NotFoundException');
+  //   });
+  // });
 });
