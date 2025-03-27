@@ -12,11 +12,13 @@ model Product {
   name         String  @unique
   priceInPLNgr String
   isInStock    Boolean @default(false)
+  description  String
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
-  name     String
+  id          Int     @id @default(autoincrement())
+  email       String  @unique
+  password    String
+  name        String
+  phoneNumber String?
 }
