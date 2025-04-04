@@ -24,7 +24,7 @@ export class AuthenticationController {
   @Post('sign-up')
   @TransformPlainToInstance(AuthenticationResponseDto)
   async signUp(@Body() signUpData: SignUpDto) {
-    return await this.authenticationService.signUp(signUpData);
+    return this.authenticationService.signUp(signUpData);
   }
 
   @HttpCode(200)
