@@ -113,7 +113,7 @@ export class ProductsService {
 
   async deleteMultiple(productsIds: number[]) {
     return this.prismaService.$transaction(async (transactionClient) => {
-      const deleteResponse = await this.prismaService.product.deleteMany({
+      const deleteResponse = await transactionClient.product.deleteMany({
         where: {
           id: {
             in: productsIds,
