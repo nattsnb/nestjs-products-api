@@ -10,9 +10,11 @@ describe('The UsersService', () => {
   let usersService: UsersService;
   let findUniqueMock: jest.Mock;
   let createMock: jest.Mock;
+  let user: User;
   beforeEach(async () => {
     findUniqueMock = jest.fn();
     createMock = jest.fn();
+
     const module = await Test.createTestingModule({
       providers: [
         UsersService,
@@ -28,25 +30,23 @@ describe('The UsersService', () => {
       ],
     }).compile();
     usersService = await module.get(UsersService);
+
+    user = {
+      id: 1,
+      email: 'john@smith.com',
+      name: 'John',
+      password: 'strongPassword123',
+      addressId: 1,
+      phoneNumber: '123456789',
+      profileImageId: 1,
+    };
+    findUniqueMock.mockResolvedValue(user);
   });
 
   describe('when the getById function is called', () => {
     describe('and the findUnique method returns the user', () => {
-      let user: User;
-      beforeEach(() => {
-        user = {
-          id: 1,
-          email: 'john@smith.com',
-          name: 'John',
-          password: 'strongPassword123',
-          addressId: 1,
-          phoneNumber: '123456789',
-          profileImageId: 1,
-        };
-        findUniqueMock.mockResolvedValue(user);
-      });
       it('should return the user', async () => {
-        const result = await usersService.getById(user.id!);
+        const result = await usersService.getById(user.id);
         expect(result).toBe(user);
       });
     });
@@ -66,22 +66,22 @@ describe('The UsersService', () => {
     let userData: UserDto;
     beforeEach(() => {
       userData = {
-        email: 'john@smith.com',
-        name: 'John',
-        password: 'strongPassword123',
+        email: user.email,
+        name: user.name,
+        password: user.password,
+        phoneNumber: user.phoneNumber,
+        address: {
+          street: 'street',
+          city: 'city',
+          country: 'country',
+        },
+        profileImage: {
+          url: 'www.example.url.pl',
+        },
       };
     });
     describe('and the prismaService.create returns a valid user', () => {
-      let user: Partial<User>;
       beforeEach(() => {
-        user = {
-          email: 'john@smith.com',
-          name: 'John',
-          password: 'strongPassword123',
-          id: 1,
-          addressId: null,
-          phoneNumber: null,
-        };
         createMock.mockResolvedValue(user);
       });
       it('should return the created user', async () => {
@@ -106,12 +106,22 @@ describe('The UsersService', () => {
     });
   });
 
-  // describe('when the getByEmail function is called', () => {
-  //   describe('and the findUnique method returns the user', () => {
-  //     it('should return the user');
-  //   })
-  //   describe('and the findUnique does not return the user', () => {
-  //     it('should throw the NotFoundException');
-  //   });
-  // });
+  describe('when the getByEmail function is called', () => {
+    describe('and the findUnique method returns the user', () => {
+      it('should return the user', async () => {
+        const result = await usersService.getByEmail('john@smith.com');
+        expect(result).toBe(user);
+      });
+    });
+    describe('and the findUnique method does not return the user', () => {
+      beforeEach(() => {
+        findUniqueMock.mockResolvedValue(undefined);
+      });
+      it('should throw the NotFoundException', async () => {
+        return expect(async () => {
+          await usersService.getByEmail('john@smith.com');
+        }).rejects.toThrow(NotFoundException);
+      });
+    });
+  });
 });
