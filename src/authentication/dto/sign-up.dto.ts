@@ -31,7 +31,7 @@ export class SignUpDto {
 
   @IsOptional()
   @IsPhoneNumber()
-  phoneNumber: string;
+  phoneNumber?: string;
 
   @CanBeUndefinied()
   @Type(() => AddressDto)

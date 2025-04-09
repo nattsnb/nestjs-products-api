@@ -80,7 +80,7 @@ describe('The AuthenticationService', () => {
           email: signUpData.email,
           name: signUpData.name,
           password: 'hashed-password',
-          phoneNumber: signUpData.phoneNumber,
+          phoneNumber: signUpData.phoneNumber ?? null,
           addressId: null,
           profileImageId: null,
         };
