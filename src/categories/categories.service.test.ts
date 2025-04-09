@@ -79,10 +79,10 @@ describe('The ProductsService', () => {
       },
       {
         id: 3,
-        name: 'Clothing',
+        name: 'electronics',
         products: [
-          { id: 301, name: 'T-shirt' },
-          { id: 302, name: 'Jeans' },
+          { id: 301, name: 'Tablet' },
+          { id: 302, name: 'Smartwatch' },
         ],
       },
     ];
@@ -283,6 +283,68 @@ describe('The ProductsService', () => {
             categoriesWithProductsArray[0].id,
           ),
         ).rejects.toThrow(NotFoundException);
+      });
+    });
+  });
+
+  describe('when the mergeCategories function is called', () => {
+    describe('and are duplicated', () => {
+      beforeEach(() => {
+        (
+          categoriesService['prismaService'].$transaction as jest.Mock
+        ).mockImplementation(async (cb) => {
+          return cb({
+            category: {
+              findMany: jest.fn().mockResolvedValue([
+                {
+                  id: categoriesWithProductsArray[0].id,
+                  name: categoriesWithProductsArray[0].name,
+                },
+                {
+                  id: categoriesWithProductsArray[2].id,
+                  name: categoriesWithProductsArray[2].name,
+                },
+              ]),
+              findUnique: jest
+                .fn()
+                .mockResolvedValue(categoriesWithProductsArray[0]),
+              update: jest.fn(),
+              delete: jest.fn(),
+            },
+          });
+        });
+      });
+      it('should merge duplicated categories into one', async () => {
+        await expect(
+          categoriesService.mergeCategories(),
+        ).resolves.not.toThrow();
+      });
+      describe('and no duplicated categories exist', () => {
+        beforeEach(() => {
+          (
+            categoriesService['prismaService'].$transaction as jest.Mock
+          ).mockImplementation(async (cb) => {
+            return cb({
+              category: {
+                findMany: jest.fn().mockResolvedValue([
+                  {
+                    id: categoriesWithProductsArray[0].id,
+                    name: categoriesWithProductsArray[0].name,
+                  },
+                  {
+                    id: categoriesWithProductsArray[1].id,
+                    name: categoriesWithProductsArray[1].name,
+                  },
+                ]),
+              },
+            });
+          });
+        });
+        it('should do nothing if there are no duplicates', async () => {
+          await expect(
+            categoriesService.mergeCategories(),
+          ).resolves.not.toThrow();
+        });
       });
     });
   });
