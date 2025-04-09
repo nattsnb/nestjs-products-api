@@ -77,7 +77,7 @@ export class CategoriesService {
     }
   }
 
-  async deleteCategoryWihProducts(categoryId: number) {
+  async deleteCategoryWithProducts(categoryId: number) {
     return this.prismaService.$transaction(async (transactionClient) => {
       const category = await transactionClient.category.findUnique({
         where: {
