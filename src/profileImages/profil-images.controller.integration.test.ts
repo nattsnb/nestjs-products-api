@@ -35,13 +35,11 @@ describe('The ProfileImageController', () => {
         {
           provide: UsersService,
           useValue: {
-            getById: jest
-              .fn()
-              .mockResolvedValue({
-                id: 1,
-                name: 'John Smith',
-                profileImageId: null,
-              }),
+            getById: jest.fn().mockResolvedValue({
+              id: 1,
+              name: 'John Smith',
+              profileImageId: null,
+            }),
           },
         },
         {
