@@ -1,9 +1,16 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { UserDto } from './user.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaError } from '../database/prisma-error.enum';
 import { UserNotFoundException } from './user-not-found-exception';
+import { ProfileImageDto } from '../profileImages/profile-image.dto';
+import { ProfileImagesService } from '../profileImages/profileImages.service';
+import { ProfileImageAlreadyExistsException } from '../profileImages/profile-image-already-exists-exception';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +19,21 @@ export class UsersService {
   async create(user: UserDto) {
     try {
       return await this.prismaService.user.create({
-        data: user,
+        data: {
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          phoneNumber: user.phoneNumber,
+          address: {
+            create: user.address,
+          },
+          profileImage: {
+            create: user.profileImage,
+          },
+        },
+        include: {
+          address: true,
+        },
       });
     } catch (error) {
       if (
@@ -29,6 +50,12 @@ export class UsersService {
       where: {
         email,
       },
+      include: {
+        address: true,
+        products: true,
+        comments: true,
+        books: true,
+      },
     });
     if (!user) {
       throw new UserNotFoundException();
@@ -41,10 +68,77 @@ export class UsersService {
       where: {
         id,
       },
+      include: {
+        address: true,
+        products: true,
+      },
     });
     if (!user) {
       throw new UserNotFoundException();
     }
     return user;
+  }
+
+  async editPhoneNumber(id: number, phoneNumber: string) {
+    try {
+      await this.prismaService.user.update({
+        data: {
+          phoneNumber: {
+            set: phoneNumber,
+          },
+        },
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+    return this.getById(id);
+  }
+
+  async deleteUser(userToDeleteId: number, newUserId?: number) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const user = await transactionClient.user.findUnique({
+        where: {
+          id: userToDeleteId,
+        },
+        include: {
+          products: true,
+        },
+      });
+
+      if (!user) {
+        throw new NotFoundException("User doesn't exist.");
+      }
+
+      const productIds = user.products.map((product) => product.id);
+
+      if (newUserId) {
+        await transactionClient.product.updateMany({
+          where: {
+            id: {
+              in: productIds,
+            },
+          },
+          data: {
+            userId: newUserId,
+          },
+        });
+      } else {
+        await transactionClient.product.deleteMany({
+          where: {
+            id: {
+              in: productIds,
+            },
+          },
+        });
+      }
+      await transactionClient.user.delete({
+        where: {
+          id: userToDeleteId,
+        },
+      });
+    });
   }
 }

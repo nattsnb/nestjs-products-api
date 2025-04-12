@@ -14,18 +14,26 @@ import { LogInDto } from './dto/log-in.dto';
 import { Response } from 'express';
 import { JwtAuthenticationGuard } from './jwt-authentication.guard';
 import { RequestWithUser } from './request-with-user';
+import { TransformPlainToInstance } from 'class-transformer';
+import { AuthenticationResponseDto } from './dto/authentication-response.dto';
+import { UsersService } from '../users/users.service';
 
 @Controller('authentication')
 export class AuthenticationController {
-  constructor(private readonly authenticationService: AuthenticationService) {}
+  constructor(
+    private readonly authenticationService: AuthenticationService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('sign-up')
+  @TransformPlainToInstance(AuthenticationResponseDto)
   async signUp(@Body() signUpData: SignUpDto) {
     return await this.authenticationService.signUp(signUpData);
   }
 
   @HttpCode(200)
   @Post('log-in')
+  @TransformPlainToInstance(AuthenticationResponseDto)
   async logIn(
     @Body() logInData: LogInDto,
     @Res({ passthrough: true }) response: Response,
@@ -46,7 +54,8 @@ export class AuthenticationController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Get()
-  authenticate(@Req() request: RequestWithUser) {
-    return request.user;
+  @TransformPlainToInstance(AuthenticationResponseDto)
+  async authenticate(@Req() request: RequestWithUser) {
+    return this.usersService.getById(request.user.id);
   }
 }

@@ -22,6 +22,9 @@ export class AuthenticationService {
       email: signUpData.email,
       name: signUpData.name,
       password: hashedPassword,
+      phoneNumber: signUpData.phoneNumber,
+      address: signUpData.address,
+      profileImage: signUpData.profileImage,
     });
   }
 

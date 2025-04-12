@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { ProductNotFoundException } from './product-not-found-exception';
 import { Prisma } from '@prisma/client';
@@ -20,6 +24,10 @@ export class ProductsService {
       where: {
         id,
       },
+      include: {
+        user: true,
+        categories: true,
+      },
     });
     if (!product) {
       throw new ProductNotFoundException(id);
@@ -27,17 +35,36 @@ export class ProductsService {
     return product;
   }
 
-  async create(product: CreateProductDto) {
+  async create(product: CreateProductDto, userId: number) {
+    const categories = product.categoryIds?.map((id) => ({ id }));
     try {
       return await this.prismaService.product.create({
-        data: product,
+        data: {
+          name: product.name,
+          priceInPLNgr: product.priceInPLNgr,
+          isInStock: product.isInStock,
+          description: product.description,
+          upvotes: 0,
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          categories: {
+            connect: categories,
+          },
+        },
+        include: {
+          categories: true,
+        },
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === PrismaError.UniqueConstraintViolated
-      ) {
+      const prismaError = error as Prisma.PrismaClientKnownRequestError;
+      if (prismaError.code === PrismaError.UniqueConstraintViolated) {
         throw new ProductAlreadyExistsException();
+      }
+      if (prismaError.code === PrismaError.RecordDoesNotExist) {
+        throw new BadRequestException('Wrong category id provided.');
       }
       throw error;
     }
@@ -82,5 +109,97 @@ export class ProductsService {
       }
       throw error;
     }
+  }
+
+  async deleteMultiple(productsIds: number[]) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const deleteResponse = await transactionClient.product.deleteMany({
+        where: {
+          id: {
+            in: productsIds,
+          },
+        },
+      });
+      if (deleteResponse.count !== productsIds.length) {
+        throw new NotFoundException();
+      }
+    });
+  }
+
+  async upvote(id: number) {
+    return this.prismaService.product.update({
+      where: {
+        id,
+      },
+      data: {
+        upvotes: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  async downvote(id: number) {
+    return this.prismaService.product.update({
+      where: {
+        id,
+      },
+      data: {
+        upvotes: {
+          decrement: 1,
+        },
+      },
+    });
+  }
+
+  async deleteAllArticlesWithUpvoteLowerThan(threshold: number) {
+    const deleteResponse = await this.prismaService.product.deleteMany({
+      where: {
+        upvotes: {
+          lt: threshold,
+        },
+      },
+    });
+
+    if (deleteResponse.count === 0) {
+      throw new NotFoundException('Not product matches criteria.');
+    }
+
+    return `Deleted ${deleteResponse.count} products.`;
+  }
+
+  async changeOwnership(oldUserId: number, newUserId: number) {
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const oldUser = await transactionClient.user.findUnique({
+        where: {
+          id: oldUserId,
+        },
+        include: {
+          products: true,
+        },
+      });
+      const newUser = await transactionClient.user.findUnique({
+        where: {
+          id: newUserId,
+        },
+      });
+
+      if (!oldUser || !newUser) {
+        throw new NotFoundException("At least one of the users doesn't exist.");
+      }
+
+      const productIds = oldUser.products.map((product) => product.id);
+
+      await transactionClient.product.updateMany({
+        where: {
+          id: {
+            in: productIds,
+          },
+        },
+        data: {
+          userId: newUserId,
+        },
+      });
+    });
   }
 }
