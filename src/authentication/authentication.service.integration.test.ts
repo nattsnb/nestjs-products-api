@@ -50,7 +50,6 @@ describe('The AuthenticationService', () => {
 
     authenticationService = await module.get(AuthenticationService);
   });
-
   describe('The AuthenticationService', () => {
     describe('when the signUp function is called', () => {
       it('should call the create method from the PrismaService', async () => {
@@ -71,39 +70,42 @@ describe('The AuthenticationService', () => {
           },
         });
       });
-    });
-    describe('when the PrismaService returns a valid user', () => {
-      let createdUser: User;
-      beforeEach(() => {
-        createdUser = {
-          id: 1,
-          email: signUpData.email,
-          name: signUpData.name,
-          password: 'hashed-password',
-          phoneNumber: signUpData.phoneNumber ?? null,
-          addressId: null,
-          profileImageId: null,
-        };
-        createMock.mockResolvedValue(createdUser);
+      describe('when the PrismaService returns a valid user', () => {
+        let createdUser: User;
+        beforeEach(() => {
+          createdUser = {
+            id: 1,
+            email: signUpData.email,
+            name: signUpData.name,
+            password: 'hashed-password',
+            phoneNumber: signUpData.phoneNumber ?? null,
+            addressId: null,
+            profileImageId: null,
+          };
+          createMock.mockResolvedValue(createdUser);
+        });
+        it('should return the user as well', async () => {
+          const result = await authenticationService.signUp(signUpData);
+          expect(result).toBe(createdUser);
+        });
       });
-      it('should return the user as well', async () => {
-        const result = await authenticationService.signUp(signUpData);
-        expect(result).toBe(createdUser);
-      });
-    });
-    describe('when the PrismaService throws the UniqueConstraintViolated error', () => {
-      beforeEach(() => {
-        createMock.mockRejectedValue(
-          new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
-            code: PrismaError.UniqueConstraintViolated,
-            clientVersion: Prisma.prismaVersion.client,
-          }),
-        );
-      });
-      it('should throw the ConflictException', () => {
-        return expect(async () => {
-          await authenticationService.signUp(signUpData);
-        }).rejects.toThrow(ConflictException);
+      describe('when the PrismaService throws the UniqueConstraintViolated error', () => {
+        beforeEach(() => {
+          createMock.mockRejectedValue(
+            new Prisma.PrismaClientKnownRequestError(
+              'Unique constraint failed',
+              {
+                code: PrismaError.UniqueConstraintViolated,
+                clientVersion: Prisma.prismaVersion.client,
+              },
+            ),
+          );
+        });
+        it('should throw the ConflictException', () => {
+          return expect(async () => {
+            await authenticationService.signUp(signUpData);
+          }).rejects.toThrow(ConflictException);
+        });
       });
     });
   });
