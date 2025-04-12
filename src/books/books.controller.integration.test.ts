@@ -8,19 +8,19 @@ import { PrismaService } from '../database/prisma.service';
 import * as request from 'supertest';
 import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
 import { prismaRecordNotFoundError } from '../Utilities/prismaRecordNotFoundError';
-import { CommentsService } from './comments.service';
-import { CommentsController } from './comments.controller';
-import { Comment } from '@prisma/client';
-import { CommentDto } from './comment.dto';
+import { Book } from '@prisma/client';
+import { BooksService } from './books.service';
+import { BooksController } from './books.controller';
+import { BookDto } from './book.dto';
 
-describe('The CommentsController', () => {
+describe('The BooksController', () => {
   let app: INestApplication;
   let findUniqueMock: jest.Mock;
   let createMock: jest.Mock;
   let findManyMock: jest.Mock;
   let updateMock: jest.Mock;
   let deleteMock: jest.Mock;
-  let commentsArray: Comment[];
+  let booksArray: Book[];
   beforeEach(async () => {
     findUniqueMock = jest.fn();
     createMock = jest.fn();
@@ -29,11 +29,11 @@ describe('The CommentsController', () => {
     deleteMock = jest.fn();
     const module = await Test.createTestingModule({
       providers: [
-        CommentsService,
+        BooksService,
         {
           provide: PrismaService,
           useValue: {
-            comment: {
+            book: {
               findUnique: findUniqueMock,
               create: createMock,
               findMany: findManyMock,
@@ -43,7 +43,7 @@ describe('The CommentsController', () => {
           },
         },
       ],
-      controllers: [CommentsController],
+      controllers: [BooksController],
       imports: [],
     })
       .overrideGuard(JwtAuthenticationGuard)
@@ -65,124 +65,126 @@ describe('The CommentsController', () => {
   });
   describe('The CommentsController', () => {
     beforeEach(() => {
-      commentsArray = [
+      booksArray = [
         {
           id: 1,
-          text: 'Comment one',
-          userId: 1,
+          title: 'Tittle one',
+          priceInPLNgr: '2345',
         },
         {
           id: 2,
-          text: 'Comment two',
-          userId: 1,
+          title: 'Tittle two',
+          priceInPLNgr: '2345',
         },
         {
           id: 3,
-          text: 'Comment three',
-          userId: 2,
+          title: 'Tittle three',
+          priceInPLNgr: '2345',
         },
       ];
     });
-    describe('when the GET /comments/:id endpoint is called', () => {
+    describe('when the GET /books/:id endpoint is called', () => {
       beforeEach(() => {
         findUniqueMock.mockImplementation((args: { where: { id: number } }) => {
-          if (args.where.id === commentsArray[0].id) {
-            return Promise.resolve(commentsArray[0]);
+          if (args.where.id === booksArray[0].id) {
+            return Promise.resolve(booksArray[0]);
           }
           return Promise.resolve(undefined);
         });
       });
-      describe('and the comment with a given id exists', () => {
-        it('should respond with the comment', () => {
+      describe('and the book with a given id exists', () => {
+        it('should respond with the book', () => {
           return request(app.getHttpServer())
-            .get(`/comments/${commentsArray[0].id}`)
-            .expect(commentsArray[0]);
+            .get(`/books/${booksArray[0].id}`)
+            .expect(booksArray[0]);
         });
       });
-      describe('and the comment with a given id does not exist', () => {
+      describe('and the book with a given id does not exist', () => {
         it('should respond with the 404 status', () => {
-          return request(app.getHttpServer()).get('/comments/4').expect(404);
+          return request(app.getHttpServer()).get('/books/4').expect(404);
         });
       });
     });
 
-    describe('and the POST /comments endpoint is called', () => {
+    describe('and the POST /books endpoint is called', () => {
       describe('and the correct data is provided', () => {
-        let newCommentData: CommentDto;
+        let newBookData: BookDto;
         beforeEach(() => {
-          newCommentData = {
-            text: commentsArray[0].text,
+          newBookData = {
+            title: booksArray[0].title,
+            priceInPLNgr: booksArray[0].priceInPLNgr,
+            authorIds: [1],
           };
-          createMock.mockResolvedValue(commentsArray[0]);
+          createMock.mockResolvedValue(booksArray[0]);
         });
-        it('should respond with the new category', () => {
+        it('should respond with the new book', () => {
           return request(app.getHttpServer())
-            .post('/comments')
-            .send(newCommentData)
-            .expect(commentsArray[0]);
+            .post('/books')
+            .send(newBookData)
+            .expect(booksArray[0]);
         });
       });
       describe('and wrong data is provided', () => {
         it('should respond with the 400 status', () => {
           return request(app.getHttpServer())
-            .post('/comments')
+            .post('/books')
             .send({})
             .expect(400);
         });
       });
     });
 
-    describe('when the GET /comments/ endpoint is called', () => {
+    describe('when the GET /books/ endpoint is called', () => {
       beforeEach(() => {
         findManyMock.mockImplementation(() => {
-          return Promise.resolve(commentsArray);
+          return Promise.resolve(booksArray);
         });
       });
 
-      it('should respond with the commentsArray', () => {
-        return request(app.getHttpServer())
-          .get('/comments')
-          .expect(commentsArray);
+      it('should respond with the booksArray', () => {
+        return request(app.getHttpServer()).get('/books').expect(booksArray);
       });
 
-      describe('and the commentsArray is empty', () => {
+      describe('and the booksArray is empty', () => {
         beforeEach(() => {
           findManyMock.mockResolvedValue([]);
         });
         it('should respond with the empty array', () => {
-          return request(app.getHttpServer()).get('/comments').expect([]);
+          return request(app.getHttpServer()).get('/books').expect([]);
         });
       });
     });
 
-    describe('and the UPDATE /comments endpoint is called', () => {
+    describe('and the UPDATE /books endpoint is called', () => {
       describe('and the correct data is provided', () => {
-        let updateCommentsData: CommentDto;
-        let updatedComment: Comment;
+        let updateBookData: BookDto;
+        let updatedBook: Book;
         beforeEach(() => {
-          const updatedName = 'New category';
-          updateCommentsData = {
-            text: updatedName,
+          const updatedTitle = 'New title';
+          updateBookData = {
+            title: updatedTitle,
+            priceInPLNgr: booksArray[0].priceInPLNgr,
+            authorIds: [1],
           };
-          updatedComment = {
-            id: commentsArray[0].id,
-            text: updatedName,
-            userId: commentsArray[0].userId,
+          updatedBook = {
+            title: updatedTitle,
+            priceInPLNgr: booksArray[0].priceInPLNgr,
+            id: booksArray[0].id,
           };
           updateMock.mockImplementation((args: { where: { id: number } }) => {
-            if (args.where.id === commentsArray[0].id) {
-              return Promise.resolve(updatedComment);
+            if (args.where.id === booksArray[0].id) {
+              return Promise.resolve(updatedBook);
             }
           });
         });
-        it('should respond with the updated comment', () => {
+        it('should respond with the updated book', () => {
           return request(app.getHttpServer())
-            .patch(`/comments/${commentsArray[0].id}`)
-            .send(updateCommentsData)
-            .expect(updatedComment);
+            .patch(`/books/${booksArray[0].id}`)
+            .send(updateBookData)
+            .expect(updatedBook);
         });
       });
-      describe('and the comment with a given id does not exist', () => {
+      describe('and the book with a given id does not exist', () => {
         beforeEach(() => {
           updateMock.mockImplementation((args: { where: { id: number } }) => {
             throw prismaRecordNotFoundError();
@@ -190,33 +192,33 @@ describe('The CommentsController', () => {
         });
         it('should respond with the 404 status', () => {
           return request(app.getHttpServer())
-            .patch(`/comments/4`)
+            .patch(`/books/4`)
             .send({})
             .expect(404);
         });
       });
     });
 
-    describe('when the DELETE /comments/:id endpoint is called', () => {
+    describe('when the DELETE /books/:id endpoint is called', () => {
       beforeEach(() => {
         deleteMock.mockImplementation((args: { where: { id: number } }) => {
-          if (args.where.id === commentsArray[0].id) {
+          if (args.where.id === booksArray[0].id) {
             return Promise.resolve();
           }
           throw prismaRecordNotFoundError();
         });
       });
-      describe('and the category with a given id exists', () => {
+      describe('and the book with a given id exists', () => {
         it('should respond with 204', () => {
           return request(app.getHttpServer())
-            .delete(`/comments/${commentsArray[0].id}`)
+            .delete(`/books/${booksArray[0].id}`)
             .expect(200);
         });
       });
 
-      describe('and the category with a given id does not exist', () => {
+      describe('and the book with a given id does not exist', () => {
         it('should respond with the 404 status', () => {
-          return request(app.getHttpServer()).delete('/comments/3').expect(404);
+          return request(app.getHttpServer()).delete('/books/3').expect(404);
         });
       });
     });
