@@ -5,24 +5,22 @@ import {
 } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { PrismaService } from '../database/prisma.service';
-import { CategoriesController } from './categories.controller';
-import { Category } from '@prisma/client';
 import * as request from 'supertest';
-import { CategoriesService } from './categories.service';
-import { ProductsService } from '../products/products.service';
 import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.guard';
-import { CreateCategoryDto } from './create-category.dto';
-import { UpdateCategoryDto } from './update-category.dto';
 import { prismaRecordNotFoundError } from '../Utilities/prismaRecordNotFoundError';
+import { CommentsService } from './comments.service';
+import { CommentsController } from './comments.controller';
+import { Comment } from '@prisma/client';
+import { CommentDto } from './comment.dto';
 
-describe('The CategoriesController', () => {
+describe('The CommentsController', () => {
   let app: INestApplication;
   let findUniqueMock: jest.Mock;
   let createMock: jest.Mock;
   let findManyMock: jest.Mock;
   let updateMock: jest.Mock;
   let deleteMock: jest.Mock;
-  let categoriesArray: Category[];
+  let commentsArray: Comment[];
   beforeEach(async () => {
     findUniqueMock = jest.fn();
     createMock = jest.fn();
@@ -31,35 +29,21 @@ describe('The CategoriesController', () => {
     deleteMock = jest.fn();
     const module = await Test.createTestingModule({
       providers: [
-        CategoriesService,
+        CommentsService,
         {
           provide: PrismaService,
           useValue: {
-            category: {
+            comment: {
               findUnique: findUniqueMock,
               create: createMock,
               findMany: findManyMock,
               update: updateMock,
               delete: deleteMock,
             },
-            $transaction: (callback: any) =>
-              callback({
-                category: {
-                  findUnique: findUniqueMock,
-                  delete: deleteMock,
-                },
-                product: {
-                  deleteMany: jest.fn(),
-                },
-              }),
           },
         },
-        {
-          provide: ProductsService,
-          useValue: {},
-        },
       ],
-      controllers: [CategoriesController],
+      controllers: [CommentsController],
       imports: [],
     })
       .overrideGuard(JwtAuthenticationGuard)
@@ -79,118 +63,126 @@ describe('The CategoriesController', () => {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     await app.init();
   });
-  describe('The CategoriesController', () => {
+  describe('The CommentsController', () => {
     beforeEach(() => {
-      categoriesArray = [
+      commentsArray = [
         {
           id: 1,
-          name: 'My category',
+          text: 'Comment one',
+          userId: 1,
         },
         {
           id: 2,
-          name: 'My other category',
+          text: 'Comment two',
+          userId: 1,
+        },
+        {
+          id: 3,
+          text: 'Comment three',
+          userId: 2,
         },
       ];
     });
-    describe('when the GET /categories/:id endpoint is called', () => {
+    describe('when the GET /comments/:id endpoint is called', () => {
       beforeEach(() => {
         findUniqueMock.mockImplementation((args: { where: { id: number } }) => {
-          if (args.where.id === categoriesArray[0].id) {
-            return Promise.resolve(categoriesArray[0]);
+          if (args.where.id === commentsArray[0].id) {
+            return Promise.resolve(commentsArray[0]);
           }
           return Promise.resolve(undefined);
         });
       });
-      describe('and the category with a given id exists', () => {
-        it('should respond with the category', () => {
+      describe('and the comment with a given id exists', () => {
+        it('should respond with the comment', () => {
           return request(app.getHttpServer())
-            .get(`/categories/${categoriesArray[0].id}`)
-            .expect(categoriesArray[0]);
+            .get(`/comments/${commentsArray[0].id}`)
+            .expect(commentsArray[0]);
         });
       });
-      describe('and the category with a given id does not exist', () => {
+      describe('and the comment with a given id does not exist', () => {
         it('should respond with the 404 status', () => {
-          return request(app.getHttpServer()).get('/categories/3').expect(404);
+          return request(app.getHttpServer()).get('/comments/4').expect(404);
         });
       });
     });
 
-    describe('and the POST /categories endpoint is called', () => {
+    describe('and the POST /comments endpoint is called', () => {
       describe('and the correct data is provided', () => {
-        let newCategoryData: CreateCategoryDto;
+        let newCommentData: CommentDto;
         beforeEach(() => {
-          newCategoryData = {
-            name: categoriesArray[0].name,
+          newCommentData = {
+            text: commentsArray[0].text,
           };
-          createMock.mockResolvedValue(categoriesArray[0]);
+          createMock.mockResolvedValue(commentsArray[0]);
         });
         it('should respond with the new category', () => {
           return request(app.getHttpServer())
-            .post('/categories')
-            .send(newCategoryData)
-            .expect(categoriesArray[0]);
+            .post('/comments')
+            .send(newCommentData)
+            .expect(commentsArray[0]);
         });
       });
       describe('and wrong data is provided', () => {
         it('should respond with the 400 status', () => {
           return request(app.getHttpServer())
-            .post('/categories')
+            .post('/comments')
             .send({})
             .expect(400);
         });
       });
     });
 
-    describe('when the GET /categories/ endpoint is called', () => {
+    describe('when the GET /comments/ endpoint is called', () => {
       beforeEach(() => {
         findManyMock.mockImplementation(() => {
-          return Promise.resolve(categoriesArray);
+          return Promise.resolve(commentsArray);
         });
       });
 
-      it('should respond with the categoriesArray', () => {
+      it('should respond with the commentsArray', () => {
         return request(app.getHttpServer())
-          .get('/categories')
-          .expect(categoriesArray);
+          .get('/comments')
+          .expect(commentsArray);
       });
 
-      describe('and the categoriesArray is empty', () => {
+      describe('and the commentsArray is empty', () => {
         beforeEach(() => {
           findManyMock.mockResolvedValue([]);
         });
         it('should respond with the empty array', () => {
-          return request(app.getHttpServer()).get('/categories').expect([]);
+          return request(app.getHttpServer()).get('/comments').expect([]);
         });
       });
     });
 
-    describe('and the UPDATE /categories endpoint is called', () => {
+    describe('and the UPDATE /comments endpoint is called', () => {
       describe('and the correct data is provided', () => {
-        let updateCategoryData: UpdateCategoryDto;
-        let updatedCategory: Category;
+        let updateCommentsData: CommentDto;
+        let updatedComment: Comment;
         beforeEach(() => {
           const updatedName = 'New category';
-          updateCategoryData = {
-            name: updatedName,
+          updateCommentsData = {
+            text: updatedName,
           };
-          updatedCategory = {
-            id: categoriesArray[0].id,
-            name: updatedName,
+          updatedComment = {
+            id: commentsArray[0].id,
+            text: updatedName,
+            userId: commentsArray[0].userId,
           };
           updateMock.mockImplementation((args: { where: { id: number } }) => {
-            if (args.where.id === categoriesArray[0].id) {
-              return Promise.resolve(updatedCategory);
+            if (args.where.id === commentsArray[0].id) {
+              return Promise.resolve(updatedComment);
             }
           });
         });
-        it('should respond with the updated category', () => {
+        it('should respond with the updated comment', () => {
           return request(app.getHttpServer())
-            .patch(`/categories/${categoriesArray[0].id}`)
-            .send(updateCategoryData)
-            .expect(updatedCategory);
+            .patch(`/comments/${commentsArray[0].id}`)
+            .send(updateCommentsData)
+            .expect(updatedComment);
         });
       });
-      describe('and the category with a given id does not exist', () => {
+      describe('and the comments with a given id does not exist', () => {
         beforeEach(() => {
           updateMock.mockImplementation((args: { where: { id: number } }) => {
             throw prismaRecordNotFoundError();
@@ -198,28 +190,17 @@ describe('The CategoriesController', () => {
         });
         it('should respond with the 404 status', () => {
           return request(app.getHttpServer())
-            .patch(`/categories/3`)
+            .patch(`/comments/4`)
             .send({})
             .expect(404);
         });
       });
     });
 
-    describe('when the DELETE /categories/:id endpoint is called', () => {
+    describe('when the DELETE /comments/:id endpoint is called', () => {
       beforeEach(() => {
-        findUniqueMock.mockImplementation((args: { where: { id: number } }) => {
-          if (args.where.id === categoriesArray[0].id) {
-            return Promise.resolve({
-              id: categoriesArray[0].id,
-              name: categoriesArray[0].name,
-              products: [],
-            });
-          }
-          return Promise.resolve(undefined);
-        });
-
         deleteMock.mockImplementation((args: { where: { id: number } }) => {
-          if (args.where.id === categoriesArray[0].id) {
+          if (args.where.id === commentsArray[0].id) {
             return Promise.resolve();
           }
           throw prismaRecordNotFoundError();
@@ -228,16 +209,14 @@ describe('The CategoriesController', () => {
       describe('and the category with a given id exists', () => {
         it('should respond with 204', () => {
           return request(app.getHttpServer())
-            .delete(`/categories/${categoriesArray[0].id}`)
+            .delete(`/comments/${commentsArray[0].id}`)
             .expect(200);
         });
       });
 
       describe('and the category with a given id does not exist', () => {
         it('should respond with the 404 status', () => {
-          return request(app.getHttpServer())
-            .delete('/categories/3')
-            .expect(404);
+          return request(app.getHttpServer()).delete('/comments/3').expect(404);
         });
       });
     });
