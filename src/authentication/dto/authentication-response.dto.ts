@@ -1,19 +1,13 @@
 import { User } from '@prisma/client';
 import { Exclude, Transform } from 'class-transformer';
+import { TransformPhoneNumberToDisplay } from '../../Utilities/transform-phone-number-to-display';
 
 export class AuthenticationResponseDto implements User {
   id: number;
   name: string;
   email: string;
 
-  @Transform(({ value: phoneNumber }) => {
-    if (!phoneNumber) {
-      return null;
-    }
-    const numberLength = phoneNumber.length;
-    const visiblePart = phoneNumber.substring(numberLength - 3, numberLength);
-    return `${'*'.repeat(numberLength - 3)}${visiblePart}`;
-  })
+  @TransformPhoneNumberToDisplay()
   phoneNumber: string | null;
 
   @Exclude()
