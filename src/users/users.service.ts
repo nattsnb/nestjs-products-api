@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { UserDto } from './user.dto';
 import { Prisma } from '@prisma/client';
@@ -46,5 +51,29 @@ export class UsersService {
       throw new UserNotFoundException();
     }
     return user;
+  }
+
+  async editPhoneNumber(id: number, phoneNumber: string) {
+    try {
+      return await this.prismaService.user.update({
+        data: {
+          phoneNumber: {
+            set: phoneNumber,
+          },
+        },
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      console.error('Unexpected error in editPhoneNumber:', error);
+      throw new InternalServerErrorException('Unexpected error occurred.');
+    }
   }
 }

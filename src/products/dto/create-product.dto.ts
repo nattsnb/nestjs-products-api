@@ -20,4 +20,8 @@ export class CreateProductDto {
   @IsBoolean()
   @Transform(({ value }) => value === 'true' || value === true)
   isInStock: boolean;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
 }

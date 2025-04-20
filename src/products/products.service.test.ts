@@ -1,9 +1,9 @@
-import {ProductsService} from "./products.service";
-import {Test} from "@nestjs/testing";
-import {ConfigModule} from "@nestjs/config";
-import {PrismaService} from "../database/prisma.service";
-import {ProductNotFoundException} from "./product-not-found-exception";
-import {WrongCredentialsException} from "../authentication/wrong-credentials-exception";
+import { ProductsService } from './products.service';
+import { Test } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
+import { PrismaService } from '../database/prisma.service';
+import { ProductNotFoundException } from './product-not-found-exception';
+import { WrongCredentialsException } from '../authentication/wrong-credentials-exception';
 
 describe('The ProductsService', () => {
   let productService: ProductsService;
@@ -18,14 +18,12 @@ describe('The ProductsService', () => {
           provide: PrismaService,
           useValue: {
             product: {
-              findUnique: findUniqueProductMock
+              findUnique: findUniqueProductMock,
             },
           },
         },
       ],
-      imports: [
-        ConfigModule.forRoot(),
-      ],
+      imports: [ConfigModule.forRoot()],
     }).compile();
 
     productService = await module.get<ProductsService>(ProductsService);
@@ -33,8 +31,8 @@ describe('The ProductsService', () => {
 
   describe('getOne', () => {
     afterEach(() => {
-      findUniqueProductMock.mockClear()
-    })
+      findUniqueProductMock.mockClear();
+    });
 
     it('should use id argument when calling the prisma.product.findUnique query', async () => {
       const productId = 1;
@@ -44,14 +42,14 @@ describe('The ProductsService', () => {
 
       expect(findUniqueProductMock).toBeCalledWith({
         where: {
-          id: productId
+          id: productId,
         },
         include: {
           user: true,
           categories: true,
         },
       });
-    })
+    });
 
     it('should return product if the product exist', async () => {
       const product = { id: 1 };
@@ -64,7 +62,9 @@ describe('The ProductsService', () => {
       const product = null;
       findUniqueProductMock.mockResolvedValue(product);
 
-      await expect(productService.getOne(1)).rejects.toThrow(ProductNotFoundException)
+      await expect(productService.getOne(1)).rejects.toThrow(
+        ProductNotFoundException,
+      );
     });
   });
 
