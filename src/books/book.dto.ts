@@ -10,7 +10,6 @@ export class BookDto {
   @IsNotEmpty()
   priceInPLNgr: string;
 
-  @CanBeUndefinied()
   @IsNumber({}, { each: true })
   authorIds: number[];
 }

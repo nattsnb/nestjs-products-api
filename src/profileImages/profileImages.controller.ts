@@ -41,7 +41,7 @@ export class ProfileImagesController {
     return this.profileImagesService.deleteProfileImage(id);
   }
 
-  @Post('')
+  @Post()
   createUserImage(
     @Req() req: RequestWithUser,
     @Body() profileImage: ProfileImageDto,
