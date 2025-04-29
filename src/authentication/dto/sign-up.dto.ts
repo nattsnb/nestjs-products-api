@@ -1,11 +1,18 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsPhoneNumber,
   IsString,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
+import { Address, ProfileImage } from '@prisma/client';
+import { CanBeUndefinied } from '../../Utilities/can-be-undefinied';
+import { Type } from 'class-transformer';
+import { AddressDto } from './address.dto';
+import { ProfileImageDto } from '../../profileImages/profile-image.dto';
 
 export class SignUpDto {
   @IsString()
@@ -23,6 +30,19 @@ export class SignUpDto {
   password: string;
 
   @IsOptional()
+  @IsString()
   @IsPhoneNumber()
   phoneNumber: string;
+
+  @CanBeUndefinied()
+  @Type(() => AddressDto)
+  @IsObject()
+  @ValidateNested()
+  address?: Address;
+
+  @CanBeUndefinied()
+  @Type(() => ProfileImageDto)
+  @IsObject()
+  @ValidateNested()
+  profileImage?: ProfileImage;
 }

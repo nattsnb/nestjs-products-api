@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { ProductNotFoundException } from './product-not-found-exception';
 import { Prisma } from '@prisma/client';
@@ -20,6 +20,10 @@ export class ProductsService {
       where: {
         id,
       },
+      include: {
+        user: true,
+        categories: true,
+      },
     });
     if (!product) {
       throw new ProductNotFoundException(id);
@@ -27,17 +31,35 @@ export class ProductsService {
     return product;
   }
 
-  async create(product: CreateProductDto) {
+  async create(product: CreateProductDto, userId: number) {
+    const categories = product.categoryIds?.map((id) => ({ id }));
     try {
       return await this.prismaService.product.create({
-        data: product,
+        data: {
+          name: product.name,
+          priceInPLNgr: product.priceInPLNgr,
+          isInStock: product.isInStock,
+          description: product.description,
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          categories: {
+            connect: categories,
+          },
+        },
+        include: {
+          categories: true,
+        },
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === PrismaError.UniqueConstraintViolated
-      ) {
+      const prismaError = error as Prisma.PrismaClientKnownRequestError;
+      if (prismaError.code === PrismaError.UniqueConstraintViolated) {
         throw new ProductAlreadyExistsException();
+      }
+      if (prismaError.code === PrismaError.RecordDoesNotExist) {
+        throw new BadRequestException('Wrong category id provided.');
       }
       throw error;
     }

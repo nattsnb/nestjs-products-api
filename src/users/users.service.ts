@@ -17,7 +17,21 @@ export class UsersService {
   async create(user: UserDto) {
     try {
       return await this.prismaService.user.create({
-        data: user,
+        data: {
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          phoneNumber: user.phoneNumber,
+          address: {
+            create: user.address,
+          },
+          profileImage: {
+            create: user.profileImage,
+          },
+        },
+        include: {
+          address: true,
+        },
       });
     } catch (error) {
       if (
@@ -34,6 +48,12 @@ export class UsersService {
       where: {
         email,
       },
+      include: {
+        address: true,
+        products: true,
+        comments: true,
+        books: true,
+      },
     });
     if (!user) {
       throw new UserNotFoundException();
@@ -45,6 +65,10 @@ export class UsersService {
     const user = await this.prismaService.user.findUnique({
       where: {
         id,
+      },
+      include: {
+        address: true,
+        products: true,
       },
     });
     if (!user) {

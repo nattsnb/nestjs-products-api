@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
@@ -16,6 +17,7 @@ import { JwtAuthenticationGuard } from '../authentication/jwt-authentication.gua
 import { TransformPlainToInstance } from 'class-transformer';
 import { ProductsListResponseDto } from './dto/products-list-response.dto';
 import { ProductsDetailsResponseDto } from './dto/products-details-response.dto';
+import { RequestWithUser } from '../authentication/request-with-user';
 
 @Controller('products')
 export class ProductsController {
@@ -35,8 +37,11 @@ export class ProductsController {
 
   @Post()
   @UseGuards(JwtAuthenticationGuard)
-  createProduct(@Body() product: CreateProductDto) {
-    return this.productsService.create(product);
+  createProduct(
+    @Body() product: CreateProductDto,
+    @Req() request: RequestWithUser,
+  ) {
+    return this.productsService.create(product, request.user.id);
   }
 
   @Patch(':id')
