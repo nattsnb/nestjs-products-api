@@ -30,6 +30,7 @@ export class SignUpDto {
   password: string;
 
   @IsOptional()
+  @IsString()
   @IsPhoneNumber()
   phoneNumber: string;
 
